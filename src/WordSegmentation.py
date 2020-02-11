@@ -61,8 +61,8 @@ def createKernel(kernelSize, sigma, theta):
 	halfSize = kernelSize // 2
 	
 	kernel = np.zeros([kernelSize, kernelSize])
-	sigmaX = sigma
-	sigmaY = sigma * theta
+	sigmaY = sigma
+	sigmaX = sigma * theta
 	
 	for i in range(kernelSize):
 		for j in range(kernelSize):
