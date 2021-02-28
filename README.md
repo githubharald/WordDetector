@@ -41,4 +41,4 @@ The illustration below shows how the algorithm works:
 
 ## Results
 This algorithm gives good results on datasets with large inter-word-distances and small intra-word-distances like IAM.
-However, for historical datasets like Bentham or Ratsprotokolle results are not very good and more complex approaches should be used instead.
+However, for historical datasets like Bentham or Ratsprotokolle results are not very good and more complex approaches should be used instead (e.g., a neural network based approach as implemented in the [WordDetectorNN repository](https://github.com/githubharald/WordDetectorNN)).
