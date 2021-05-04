@@ -1,41 +1,50 @@
-import os
+import argparse
+from typing import List
+
 import cv2
-from WordSegmentation import wordSegmentation, prepareImg
+import matplotlib.pyplot as plt
+from path import Path
+
+from word_detector import detect_words, prepare_img
+
+
+def get_img_files(data_dir: Path) -> List[Path]:
+    """return all image files contained in a folder"""
+    res = []
+    for ext in ['*.png', '*.jpg', '*.bmp']:
+        res += Path(data_dir).files(ext)
+    return res
 
 
 def main():
-	"""reads images from data/ and outputs the word-segmentation to out/"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', type=Path, default=Path('../data/line'))
+    parser.add_argument('--kernel_size', type=int, default=25)
+    parser.add_argument('--sigma', type=int, default=11)
+    parser.add_argument('--theta', type=int, default=7)
+    parser.add_argument('--min_area', type=int, default=100)
+    parser.add_argument('--img_height', type=int, default=50)
+    parsed = parser.parse_args()
 
-	# read input images from 'in' directory
-	imgFiles = os.listdir('../data/')
-	for (i,f) in enumerate(imgFiles):
-		print('Segmenting words of sample %s'%f)
-		
-		# read image, prepare it by resizing it to fixed height and converting it to grayscale
-		img = prepareImg(cv2.imread('../data/%s'%f), 50)
-		
-		# execute segmentation with given parameters
-		# -kernelSize: size of filter kernel (odd integer)
-		# -sigma: standard deviation of Gaussian function used for filter kernel
-		# -theta: approximated width/height ratio of words, filter function is distorted by this factor
-		# - minArea: ignore word candidates smaller than specified area
-		res = wordSegmentation(img, kernelSize=25, sigma=11, theta=7, minArea=100)
-		
-		# write output to 'out/inputFileName' directory
-		if not os.path.exists('../out/%s'%f):
-			os.mkdir('../out/%s'%f)
-		
-		# iterate over all segmented words
-		print('Segmented into %d words'%len(res))
-		for (j, w) in enumerate(res):
-			(wordBox, wordImg) = w
-			(x, y, w, h) = wordBox
-			cv2.imwrite('../out/%s/%d.png'%(f, j), wordImg) # save word
-			cv2.rectangle(img,(x,y),(x+w,y+h),0,1) # draw bounding box in summary image
-		
-		# output summary image with bounding boxes around words
-		cv2.imwrite('../out/%s/summary.png'%f, img)
+    for fn_img in get_img_files(parsed.data):
+        print(f'Processing file {fn_img}')
+
+        # load image and process it
+        img = prepare_img(cv2.imread(fn_img), parsed.img_height)
+        res = detect_words(img,
+                           kernel_size=parsed.kernel_size,
+                           sigma=parsed.sigma,
+                           theta=parsed.theta,
+                           min_area=parsed.min_area)
+
+        # plot results
+        plt.imshow(img, cmap='gray')
+        for det in res:
+            xs = [det.bbox.x, det.bbox.x, det.bbox.x + det.bbox.w, det.bbox.x + det.bbox.w, det.bbox.x]
+            ys = [det.bbox.y, det.bbox.y + det.bbox.h, det.bbox.y + det.bbox.h, det.bbox.y, det.bbox.y]
+            plt.plot(xs, ys)
+        plt.show()
 
 
 if __name__ == '__main__':
-	main()
+    main()
