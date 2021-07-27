@@ -1,5 +1,7 @@
 # Word segmentation
 
+**Update 2021: installable Python package, added line clustering and word sorting**
+
 Implementation of the scale space technique for word segmentation proposed by 
 [R. Manmatha and N. Srimal](http://ciir.cs.umass.edu/pubfiles/mm-27.pdf). 
 Even though the paper is from 1999, the method still achieves good results, is fast, and has a simple implementation. 
