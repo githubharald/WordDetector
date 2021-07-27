@@ -23,8 +23,8 @@ class DetectorRes:
 
 def detect(img: np.ndarray,
            kernel_size: int,
-           sigma: int,
-           theta: int,
+           sigma: float,
+           theta: float,
            min_area: int) -> List[DetectorRes]:
     """Scale space technique for word segmentation proposed by R. Manmatha.
 
@@ -63,48 +63,36 @@ def detect(img: np.ndarray,
     return res
 
 
-# cache for already computed kernels
-_kernel_cache = {}
-
-
-def _get_kernel(kernel_size: int,
-                sigma: int,
-                theta: int) -> np.ndarray:
-    """Create anisotropic filter kernel."""
-    cache_key = (kernel_size, sigma, theta)
-    global _kernel_cache
-    if cache_key in _kernel_cache:
-        return _kernel_cache[cache_key]
+def _compute_kernel(kernel_size: int,
+                sigma: float,
+                theta: float) -> np.ndarray:
+    """Compute anisotropic filter kernel."""
 
     assert kernel_size % 2  # must be odd size
+
+    # create coordinate grid
     half_size = kernel_size // 2
+    xs = ys = np.linspace(-half_size, half_size, kernel_size)
+    x, y = np.meshgrid(xs, ys)
 
-    kernel = np.zeros([kernel_size, kernel_size])
-    sigma_x = sigma
-    sigma_y = sigma * theta
+    # compute sigma values in x and y direction, where theta is roughly the average x/y ratio of words
+    sigma_y = sigma
+    sigma_x = sigma_y * theta
 
-    # TODO: vectorize!
-    for i in range(kernel_size):
-        for j in range(kernel_size):
-            x = i - half_size
-            y = j - half_size
+    # compute terms and combine them
+    exp_term = np.exp(-x ** 2 / (2 * sigma_x) - y ** 2 / (2 * sigma_y))
+    x_term = (x ** 2 - sigma_x ** 2) / (2 * np.math.pi * sigma_x ** 5 * sigma_y)
+    y_term = (y ** 2 - sigma_y ** 2) / (2 * np.math.pi * sigma_y ** 5 * sigma_x)
+    kernel = (x_term + y_term) * exp_term
 
-            exp_term = np.exp(-x ** 2 / (2 * sigma_x) - y ** 2 / (2 * sigma_y))
-            x_term = (x ** 2 - sigma_x ** 2) / (2 * np.math.pi * sigma_x ** 5 * sigma_y)
-            y_term = (y ** 2 - sigma_y ** 2) / (2 * np.math.pi * sigma_y ** 5 * sigma_x)
-
-            kernel[i, j] = (x_term + y_term) * exp_term
-
+    # normalize and return kernel
     kernel = kernel / np.sum(kernel)
-
-    # cache kernel and return it
-    _kernel_cache[cache_key] = kernel
     return kernel
 
 
 def prepare_img(img: np.ndarray,
                 height: int) -> np.ndarray:
-    """Convert given image to grayscale image (if needed) and resize to given height."""
+    """Convert image to grayscale image (if needed) and resize to given height."""
     assert img.ndim in (2, 3)
     assert height > 0
     assert img.dtype == np.uint8
@@ -117,8 +105,7 @@ def prepare_img(img: np.ndarray,
 
 def _cluster_lines(detections: List[DetectorRes],
                    max_dist: float = 0.7,
-                   min_words_per_line: int = 2
-                   ) -> List[List[DetectorRes]]:
+                   min_words_per_line: int = 2) -> List[List[DetectorRes]]:
     # compute matrix containing Jaccard distances (which is a proper metric)
     num_bboxes = len(detections)
     dist_mat = np.ones((num_bboxes, num_bboxes))

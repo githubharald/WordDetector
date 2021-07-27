@@ -1,12 +1,12 @@
-# Word segmentation
+# Word Segmentation with Scale Space Technique
 
 **Update 2021: installable Python package, added line clustering and word sorting**
 
 Implementation of the scale space technique for word segmentation proposed by 
 [R. Manmatha and N. Srimal](http://ciir.cs.umass.edu/pubfiles/mm-27.pdf). 
 Even though the paper is from 1999, the method still achieves good results, is fast, and has a simple implementation. 
-The algorithm takes an **image containing words as input** and **outputs the segmented words**.
-Optionally, the detected words can be sorted according to reading order (top to bottom, left to right).
+The algorithm takes an **image containing words as input** and **outputs the detected words**.
+Optionally, the words can be sorted according to reading order (top to bottom, left to right).
 
 ![example](./doc/example.png)
 
