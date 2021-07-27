@@ -15,6 +15,7 @@ Optionally, the detected words can be sorted according to reading order (top to 
 * Go to the root level of the repository
 * Execute `pip install .`
 * Go to `examples/` and run the detector on some sample images to see if installation worked:
+  * Install requirements for the example script: `pip install -r requirements.txt`
   * Run `python main.py` to detect words in line images (IAM dataset)
   * Or, run `python main.py --data ../data/page --img_height 1000 --theta 5` to run the detector on an image of a page (also from IAM dataset)
 
