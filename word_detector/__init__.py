@@ -44,7 +44,7 @@ def detect(img: np.ndarray,
     assert img.dtype == np.uint8
 
     # apply filter kernel
-    kernel = _get_kernel(kernel_size, sigma, theta)
+    kernel = _compute_kernel(kernel_size, sigma, theta)
     img_filtered = cv2.filter2D(img, -1, kernel, borderType=cv2.BORDER_REPLICATE).astype(np.uint8)
     img_thres = 255 - cv2.threshold(img_filtered, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
@@ -64,8 +64,8 @@ def detect(img: np.ndarray,
 
 
 def _compute_kernel(kernel_size: int,
-                sigma: float,
-                theta: float) -> np.ndarray:
+                    sigma: float,
+                    theta: float) -> np.ndarray:
     """Compute anisotropic filter kernel."""
 
     assert kernel_size % 2  # must be odd size
