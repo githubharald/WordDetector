@@ -3,3 +3,4 @@ numpy
 opencv-python
 path
 sklearn
+pytest

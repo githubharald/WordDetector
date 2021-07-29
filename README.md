@@ -6,7 +6,7 @@ Implementation of the scale space technique for word segmentation proposed by
 [R. Manmatha and N. Srimal](http://ciir.cs.umass.edu/pubfiles/mm-27.pdf). 
 Even though the paper is from 1999, the method still achieves good results, is fast, and has a simple implementation. 
 The algorithm takes an **image containing words as input** and **outputs the detected words**.
-Optionally, the words can be sorted according to reading order (top to bottom, left to right).
+Optionally, the words are sorted according to reading order (top to bottom, left to right).
 
 ![example](./doc/example.png)
 
@@ -14,10 +14,7 @@ Optionally, the words can be sorted according to reading order (top to bottom, l
 
 * Go to the root level of the repository
 * Execute `pip install .`
-* Go to `examples/` and run the detector on some sample images to see if installation worked:
-  * Install requirements for the example script: `pip install -r requirements.txt`
-  * Run `python main.py` to detect words in line images (IAM dataset)
-  * Or, run `python main.py --data ../data/page --img_height 1000 --theta 5` to run the detector on an image of a page (also from IAM dataset)
+* Go to `tests/` and execute `pytest` to check if installation worked
 
 ## Usage
 
@@ -45,18 +42,27 @@ detections = detect(img,
 line = sort_line(detections)[0]
 
 # (4) show word images
+plt.subplot(len(line), 1, 1)
+plt.imshow(img, cmap='gray')
 for i, word in enumerate(line):
   print(word.bbox)
-  plt.subplot(len(line), 1, i + 1)
+  plt.subplot(len(line), 1, i + 2)
   plt.imshow(word.img, cmap='gray')
 plt.show()
 ````
 
+The repository contains some examples showing how to use the package:
+* Install requirements: `pip install -r requirements.txt`
+* Go to `examples/`
+* Run `python main.py` to detect words in line images (IAM dataset)
+* Or, run `python main.py --data ../data/page --img_height 1000 --theta 5` to run the detector on an image of a page (also from IAM dataset)
+
+
 The package contains the following functions:
-* prepare_img: prepares input image for detector
-* detect: detect words in image
-* sort_line: sort words in a (single) line
-* sort_multiline: cluster words into lines, then sort each line separately
+* `prepare_img`: prepares input image for detector
+* `detect`: detect words in image
+* `sort_line`: sort words in a (single) line
+* `sort_multiline`: cluster words into lines, then sort each line separately
 
 For more details on the functions and their parameters use `help(function_name)`, e.g. `help(detect)`.
 
