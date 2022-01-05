@@ -118,8 +118,7 @@ def _cluster_lines(detections: List[DetectorRes],
             intersection = min(a.y + a.h, b.y + b.h) - max(a.y, b.y)
             union = a.h + b.h - intersection
             iou = np.clip(intersection / union if union > 0 else 0, 0, 1)
-            dist_mat[i, j] = 1 - iou  # Jaccard distance is defined as 1-iou
-            #dist_mat[j, i] = dist_mat[i, j] # the matrix is symetric
+            dist_mat[i, j] = dist_mat[j, i] = 1 - iou  # Jaccard distance is defined as 1-iou
 
     dbscan = DBSCAN(eps=max_dist, min_samples=min_words_per_line, metric='precomputed').fit(dist_mat)
 
