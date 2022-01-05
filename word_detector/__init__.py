@@ -110,7 +110,7 @@ def _cluster_lines(detections: List[DetectorRes],
     num_bboxes = len(detections)
     dist_mat = np.ones((num_bboxes, num_bboxes))
     for i in range(num_bboxes):
-        for j in range(num_bboxes):
+        for j in range(i, num_bboxes):
             a = detections[i].bbox
             b = detections[j].bbox
             if a.y > b.y + b.h or b.y > a.y + a.h:
@@ -118,7 +118,7 @@ def _cluster_lines(detections: List[DetectorRes],
             intersection = min(a.y + a.h, b.y + b.h) - max(a.y, b.y)
             union = a.h + b.h - intersection
             iou = np.clip(intersection / union if union > 0 else 0, 0, 1)
-            dist_mat[i, j] = 1 - iou  # Jaccard distance is defined as 1-iou
+            dist_mat[i, j] = dist_mat[j, i] = 1 - iou  # Jaccard distance is defined as 1-iou
 
     dbscan = DBSCAN(eps=max_dist, min_samples=min_words_per_line, metric='precomputed').fit(dist_mat)
 
