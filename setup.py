@@ -7,6 +7,6 @@ setup(
     author='Harald Scheidl',
     packages=['word_detector'],
     url="https://github.com/githubharald/WordDetector",
-    install_requires=['numpy', 'sklearn', 'opencv-python'],
+    install_requires=['numpy', 'scikit-learn', 'opencv-python'],
     python_requires='>=3.7'
 )

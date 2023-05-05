@@ -2,5 +2,5 @@ matplotlib
 numpy
 opencv-python
 path
-sklearn
+scikit-learn
 pytest
